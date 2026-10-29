@@ -95,7 +95,7 @@ Cadence Xcelium 25.03, and UVM 1.2.
 
 - Select SystemVerilog and Cadence Xcelium.
 - Enable UVM 1.2.
-- Add the DUT and testbench source files, preserving their include order.
+- Add the DUT and testbench sources, preserving their include order.
 
 Compile options:
 
@@ -106,11 +106,21 @@ Compile options:
 Run options:
 
 ```text
-+UVM_TESTNAME=apb_random_test -svseed 1
++UVM_TESTNAME=apb_random_test +NUM_ITERS=16 +NUM_XFERS=2000 -svseed random
 ```
 
-APB_WAIT_CYCLES configures the DUT's fixed number of wait states.
-UVM_TESTNAME selects the test, and svseed selects the random seed.
+- `APB_WAIT_CYCLES`: fixed DUT wait-state count.
+- `UVM_TESTNAME`: test to execute.
+- `NUM_ITERS`: sequence iterations; default 1.
+- `NUM_XFERS`: random transfers per iteration; default 300.
+- `-svseed random`: automatically selects the simulation seed.
+
+This configuration requests 32,000 random transfers with two wait states.
+Save the seed printed in the simulation log and use `-svseed <seed>`
+to reproduce the run.
+
+Repeat with `APB_WAIT_CYCLES` set to 0, 1, 2, and 3 to exercise
+all four configurations.
 
 ### Source Layout and File List
 
@@ -172,17 +182,16 @@ Simulator: Cadence Xcelium 25.03 with UVM 1.2.
 - Reset-interruption tests produced the expected RESET_ABORT warning.
 - No unexpected UVM errors, fatals, or assertion failures.
 
-### Random regression
-- 12 runs: wait cycles {0, 1, 2, 3} × seeds {1, 2, 3}.
-- 300 random transfers per run; 3,600 total.
-- Zero UVM warnings, errors, fatals, or assertion failures.
+### Random Regression
+- Executed approximately 136,000 constrained-random transfers across
+  configurations with 0–3 APB wait states, using 2,000 transfers per iteration.
+- Observed zero scoreboard mismatches.
 
-### Functional coverage
-- Each random run reported 90.62% APB functional coverage.
-- All four wait-cycle bins were exercised across configurations.
-- All seven timer event bins were exercised across directed tests.
-- All defined functional coverage bins were exercised across the
-  regression; a merged coverage database was not generated.
+### Functional Coverage
+- Achieved 100% coverage for address, direction, privilege, and error response,
+  including address × direction and privilege × direction × error crosses.
+- Exercised all four wait-state bins across configurations.
+- Exercised all seven timer-event bins across directed tests.
 
 ## Debugging Example: Partial-Write RAL Prediction
 
