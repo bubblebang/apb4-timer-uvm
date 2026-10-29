@@ -270,6 +270,9 @@ class apb_random_test extends apb_base_test;
 
   `uvm_component_utils(apb_random_test)
 
+  int unsigned num_iters = 1;
+  int unsigned num_xfers = 300;
+
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction : new
@@ -277,10 +280,23 @@ class apb_random_test extends apb_base_test;
   virtual task run_phase(uvm_phase phase);
     apb_random_seq seq;
 
-    seq = apb_random_seq::type_id::create("seq");
+    void'($value$plusargs("NUM_ITERS=%d", num_iters));
+    void'($value$plusargs("NUM_XFERS=%d", num_xfers));
 
     phase.raise_objection(this, get_type_name());
-    seq.start(env.agent.sequencer);
+
+    for (int unsigned i = 0; i < num_iters; i++) begin
+      `uvm_info(
+        "ITER",
+        $sformatf("Iteration %0d of %0d (%0d transfers)", i + 1, num_iters, num_xfers),
+        UVM_LOW
+      )
+
+      seq = apb_random_seq::type_id::create($sformatf("seq_%0d", i));
+      seq.num_transfers = num_xfers;
+      seq.start(env.agent.sequencer);
+    end
+
     phase.drop_objection(this, get_type_name());
   endtask : run_phase
 
