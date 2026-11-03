@@ -149,7 +149,7 @@ On EDA Playground, use flat source tabs with the original included
 filenames. Place the DUT in design.sv and the contents of tb_top.sv
 in testbench.sv. The repository's files.f is not required there.
 
-The earlier standalone testbench in examples/smog_test.sv is
+The earlier standalone testbench in examples/smoke_test.sv is
 excluded from the UVM build because it defines a separate tb_top.
 
 ### Regression Configuration
